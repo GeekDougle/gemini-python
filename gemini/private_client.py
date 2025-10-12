@@ -21,9 +21,9 @@ class PrivateClient(PublicClient):
         self._public_key = PUBLIC_API_KEY
         self._private_key = PRIVATE_API_KEY
         if sandbox:
-            self._base_url = 'https://api.sandbox.gemini.com'
+            self._base_url = "https://api.sandbox.gemini.com"
         else:
-            self._base_url = 'https://api.gemini.com'
+            self._base_url = "https://api.gemini.com"
 
     @typeassert(method=str, payload=dict)
     def api_query(self, method, payload=None):
@@ -31,18 +31,20 @@ class PrivateClient(PublicClient):
             payload = {}
         request_url = self._base_url + method
 
-        payload['request'] = method
-        payload['nonce'] = int(time.time() * 1000)
-        b64_payload = base64.b64encode(json.dumps(payload).encode('utf-8'))
-        signature = hmac.new(self._private_key.encode('utf-8'), b64_payload, hashlib.sha384).hexdigest()
+        payload["request"] = method
+        payload["nonce"] = int(time.time() * 1000)
+        b64_payload = base64.b64encode(json.dumps(payload).encode("utf-8"))
+        signature = hmac.new(
+            self._private_key.encode("utf-8"), b64_payload, hashlib.sha384
+        ).hexdigest()
 
         headers = {
-            'Content-Type': "text/plain",
-            'Content-Length': "0",
-            'X-GEMINI-APIKEY': self._public_key,
-            'X-GEMINI-PAYLOAD': b64_payload,
-            'X-GEMINI-SIGNATURE': signature,
-            'Cache-Control': "no-cache"
+            "Content-Type": "text/plain",
+            "Content-Length": "0",
+            "X-GEMINI-APIKEY": self._public_key,
+            "X-GEMINI-PAYLOAD": b64_payload,
+            "X-GEMINI-SIGNATURE": signature,
+            "Cache-Control": "no-cache",
         }
 
         r = requests.post(request_url, headers=headers)
@@ -89,14 +91,14 @@ class PrivateClient(PublicClient):
             }
         """
         payload = {
-            'symbol': symbol,
-            'amount': amount,
-            'price': price,
-            'side': side,
-            'options': options,
-            'type': 'exchange limit'
+            "symbol": symbol,
+            "amount": amount,
+            "price": price,
+            "side": side,
+            "options": options,
+            "type": "exchange limit",
         }
-        return self.api_query('/v1/order/new', payload)
+        return self.api_query("/v1/order/new", payload)
 
     @typeassert(order_id=str)
     def cancel_order(self, order_id):
@@ -130,10 +132,8 @@ class PrivateClient(PublicClient):
                 'original_amount': '0.02'
             }
         """
-        payload = {
-            'order_id': order_id
-        }
-        return self.api_query('/v1/order/cancel', payload)
+        payload = {"order_id": order_id}
+        return self.api_query("/v1/order/cancel", payload)
 
     @typeassert(symbol=str, amount=str, side=str)
     def wrap_order(self, symbol, amount, side):
@@ -155,10 +155,10 @@ class PrivateClient(PublicClient):
             "quantityCurrency, totalSpend, totalSpendCurrency, fee, feeCurrency, depositFee, depositFeeCurrency
         """
         payload = {
-            'amount': amount,
-            'side': side,
+            "amount": amount,
+            "side": side,
         }
-        return self.api_query('/v1/wrap/{}'.format(symbol), payload)
+        return self.api_query("/v1/wrap/{}".format(symbol), payload)
 
     def cancel_session_orders(self):
         """
@@ -175,7 +175,7 @@ class PrivateClient(PublicClient):
                 }
             }
         """
-        return self.api_query('/v1/order/cancel/session')
+        return self.api_query("/v1/order/cancel/session")
 
     def cancel_all_orders(self):
         """
@@ -183,7 +183,7 @@ class PrivateClient(PublicClient):
 
         Results: Same as cancel_session_order
         """
-        return self.api_query('/v1/order/cancel/all')
+        return self.api_query("/v1/order/cancel/all")
 
     # Order Status API
     @typeassert(order_id=str)
@@ -222,10 +222,8 @@ class PrivateClient(PublicClient):
                 'original_amount': '3'
             }
         """
-        payload = {
-            'order_id': order_id
-        }
-        return self.api_query('/v1/order/status', payload)
+        payload = {"order_id": order_id}
+        return self.api_query("/v1/order/status", payload)
 
     def active_orders(self):
         """
@@ -235,7 +233,7 @@ class PrivateClient(PublicClient):
             array: An array of the results of /order/status for all your live orders.
             Each entry is similar to status_of_order
         """
-        return self.api_query('/v1/orders')
+        return self.api_query("/v1/orders")
 
     @typeassert(symbol=str, limit_trades=int)
     def get_past_trades(self, symbol, limit_trades=None):
@@ -252,9 +250,9 @@ class PrivateClient(PublicClient):
         """
         payload = {
             "symbol": symbol,
-            "limit_trades": 500 if limit_trades is None else limit_trades
+            "limit_trades": 500 if limit_trades is None else limit_trades,
         }
-        return self.api_query('/v1/mytrades', payload)
+        return self.api_query("/v1/mytrades", payload)
 
     def get_trade_volume(self):
         """
@@ -264,7 +262,7 @@ class PrivateClient(PublicClient):
         Results:
             array: An array of dicts of the past trades
         """
-        return self.api_query('/v1/tradevolume')
+        return self.api_query("/v1/tradevolume")
 
     # Fund Management API
     def get_balance(self):
@@ -290,7 +288,7 @@ class PrivateClient(PublicClient):
                 }
             ]
         """
-        return self.api_query('/v1/balances')
+        return self.api_query("/v1/balances")
 
     @typeassert(currency=str, label=str)
     def create_deposit_address(self, currency, label=None):
@@ -305,12 +303,10 @@ class PrivateClient(PublicClient):
             dict: A dict of the following fields: currency, address, label
         """
         if label:
-            payload = {
-                "label": label
-            }
+            payload = {"label": label}
         else:
             payload = {}
-        return self.api_query('/v1/deposit/{}/newAddress'.format(currency), payload)
+        return self.api_query("/v1/deposit/{}/newAddress".format(currency), payload)
 
     @typeassert(currency=str, address=str, amount=str)
     def withdraw_to_address(self, currency, address, amount):
@@ -331,15 +327,14 @@ class PrivateClient(PublicClient):
         Results:
             dict: A dict of the following fields: destination, amount, txHash
         """
-        payload = {
-            "address": address,
-            "amount": amount
-        }
-        return self.api_query('/v1/withdraw/{}'.format(currency), payload)
+        payload = {"address": address, "amount": amount}
+        return self.api_query("/v1/withdraw/{}".format(currency), payload)
 
     # Transfers API
     @typeassert(limit_transfers=int, show_completed_deposit_advances=bool)
-    def get_past_transfers(self, limit_transfers=None, show_completed_deposit_advances=False):
+    def get_past_transfers(
+        self, limit_transfers=None, show_completed_deposit_advances=False
+    ):
         """
         Returns all the past transfers associated with the API.
         Providing a limit_trade is optional.
@@ -354,22 +349,22 @@ class PrivateClient(PublicClient):
         """
         payload = {
             "limit_transfers": 500 if limit_transfers is None else limit_transfers,
-            "show_completed_deposit_advances": show_completed_deposit_advances
+            "show_completed_deposit_advances": show_completed_deposit_advances,
         }
-        return self.api_query('/v1/transfers', payload)
+        return self.api_query("/v1/transfers", payload)
 
-    # Staking API
+    # Staking API- Needs troubleshooting
     @typeassert(limit_transfers=int, since=datetime, until=datetime)
     def get_staking_history(self, limit_transfers=None, since=None, until=None):
         """
         Returns upto 500 past transfers associated with the API in descending timestamp order.
         Providing a limit_transfers number and/or since/until datetime is optional.
-        
+
         Args:
             limit_trades(int): Default value is 500
             since: Datetime object for the earliest transaction to retrieve
             until: Datetime object for the latest transaction to retrieve
-            
+
         Results:
             array: An array of of dicts of the  staking deposits, redemptions and interest accruals.
         """
@@ -377,27 +372,27 @@ class PrivateClient(PublicClient):
             "limit_transfers": 500 if limit_transfers is None else limit_transfers,
         }
         if since is not None:
-            payload["since"] = int(since.timestamp()*1000)
+            payload["since"] = int(since.timestamp() * 1000)
         else:
             payload["since"] = 0
         if until is not None:
-            payload["until"] = int(until.timestamp()*1000)    
+            payload["until"] = int(until.timestamp() * 1000)
         else:
-            payload["until"] = int(datetime.now().timestamp()*1000) 
-        return self.api_query('/v1/staking/history', payload)
+            payload["until"] = int(datetime.now().timestamp() * 1000)
+        return self.api_query("/v1/staking/history", payload)
 
-    # Staking API
+    # Staking API- Needs troubleshooting
     @typeassert(limit_transfers=int, since=datetime, until=datetime)
     def get_staking_rewards(self, limit_transfers=None, since=None, until=None):
         """
         Returns upto 500 past staking rewards associated with the API in descending timestamp order.
         Providing a limit_transfers number and/or since/until datetime is optional.
-        
+
         Args:
             limit_trades(int): Default value is 500
             since: Datetime object for the earliest transaction to retrieve
             until: Datetime object for the latest transaction to retrieve
-            
+
         Results:
             array: An array of of dicts of the  staking deposits, redemptions and interest accruals.
         """
@@ -405,18 +400,18 @@ class PrivateClient(PublicClient):
             "limit_transfers": 500 if limit_transfers is None else limit_transfers,
         }
         if since is not None:
-            payload["since"] = int(since.timestamp()*1000)
+            payload["since"] = int(since.timestamp() * 1000)
         else:
             payload["since"] = 0
         if until is not None:
-            payload["until"] = int(until.timestamp()*1000)    
+            payload["until"] = int(until.timestamp() * 1000)
         else:
-            payload["until"] = int(datetime.now().timestamp()*1000) 
-        return self.api_query('/v1/staking/history', payload)    
-    
+            payload["until"] = int(datetime.now().timestamp() * 1000)
+        return self.api_query("/v1/staking/history", payload)
+
     # HeartBeat API
     def revive_hearbeat(self):
         """
         Revive the heartbeat if 'heartbeat' is selected for the API.
         """
-        return self.api_query('/v1/heartbeat')
+        return self.api_query("/v1/heartbeat")
