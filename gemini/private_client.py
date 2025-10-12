@@ -11,6 +11,7 @@ import hmac
 import hashlib
 import base64
 import time
+from datetime import datetime
 
 
 class PrivateClient(PublicClient):
@@ -357,6 +358,62 @@ class PrivateClient(PublicClient):
         }
         return self.api_query('/v1/transfers', payload)
 
+    # Staking API
+    @typeassert(limit_transfers=int, since=datetime, until=datetime)
+    def get_staking_history(self, limit_transfers=None, since=None, until=None):
+        """
+        Returns upto 500 past transfers associated with the API in descending timestamp order.
+        Providing a limit_transfers number and/or since/until datetime is optional.
+        
+        Args:
+            limit_trades(int): Default value is 500
+            since: Datetime object for the earliest transaction to retrieve
+            until: Datetime object for the latest transaction to retrieve
+            
+        Results:
+            array: An array of of dicts of the  staking deposits, redemptions and interest accruals.
+        """
+        payload = {
+            "limit_transfers": 500 if limit_transfers is None else limit_transfers,
+        }
+        if since is not None:
+            payload["since"] = int(since.timestamp()*1000)
+        else:
+            payload["since"] = 0
+        if until is not None:
+            payload["until"] = int(until.timestamp()*1000)    
+        else:
+            payload["until"] = int(datetime.now().timestamp()*1000) 
+        return self.api_query('/v1/staking/history', payload)
+
+    # Staking API
+    @typeassert(limit_transfers=int, since=datetime, until=datetime)
+    def get_staking_rewards(self, limit_transfers=None, since=None, until=None):
+        """
+        Returns upto 500 past staking rewards associated with the API in descending timestamp order.
+        Providing a limit_transfers number and/or since/until datetime is optional.
+        
+        Args:
+            limit_trades(int): Default value is 500
+            since: Datetime object for the earliest transaction to retrieve
+            until: Datetime object for the latest transaction to retrieve
+            
+        Results:
+            array: An array of of dicts of the  staking deposits, redemptions and interest accruals.
+        """
+        payload = {
+            "limit_transfers": 500 if limit_transfers is None else limit_transfers,
+        }
+        if since is not None:
+            payload["since"] = int(since.timestamp()*1000)
+        else:
+            payload["since"] = 0
+        if until is not None:
+            payload["until"] = int(until.timestamp()*1000)    
+        else:
+            payload["until"] = int(datetime.now().timestamp()*1000) 
+        return self.api_query('/v1/staking/history', payload)    
+    
     # HeartBeat API
     def revive_hearbeat(self):
         """
