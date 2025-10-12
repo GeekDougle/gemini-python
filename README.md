@@ -21,6 +21,10 @@ r = gemini.PublicClient(sandbox=True)
 ```python
 r.symbols()
 ```
+- [symbol_details](https://docs.gemini.com/rest-api/#symbol-details)
+```python
+r.symbol_details("BTCUSD")
+```
 - [get_ticker](https://docs.gemini.com/rest-api/#ticker)
 ```python
 r.get_ticker("BTCUSD")
@@ -74,6 +78,10 @@ r.new_order("BTCUSD", "200", "6000", "buy")
 - [cancel_order](https://docs.gemini.com/rest-api/#cancel-order)
 ```python
 r.cancel_order("866403510")
+```
+- [wrap_order](https://docs.gemini.com/rest-api/#wrap-order)
+```python
+r.wrap_order("GUSDUSD", "10", "buy")
 ```
 - [cancel_session_orders](https://docs.gemini.com/rest-api/#cancel-all-session-orders)
 ```python
