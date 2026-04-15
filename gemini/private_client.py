@@ -407,7 +407,7 @@ class PrivateClient(PublicClient):
             payload["until"] = int(until.timestamp() * 1000)
         else:
             payload["until"] = int(datetime.now().timestamp() * 1000)
-        return self.api_query("/v1/staking/history", payload)
+        return self.api_query("/v1/staking/rewards", payload)
 
     # HeartBeat API
     def revive_hearbeat(self):
