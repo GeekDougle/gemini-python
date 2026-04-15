@@ -17,6 +17,9 @@ import hmac
 import hashlib
 import base64
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class OrderEventsWS(BaseWebSocket):
@@ -33,7 +36,7 @@ class OrderEventsWS(BaseWebSocket):
 
     @property
     def get_order_types(self):
-        print("Order types are: subscription_ack', 'heartbeat', 'initial', "
+        logger.info("Order types are: subscription_ack', 'heartbeat', 'initial', "
               "'accepted','rejected', 'booked', 'fill', 'cancelled', "
               "cancel_rejected' or 'closed'")
 
@@ -121,9 +124,9 @@ class OrderEventsWS(BaseWebSocket):
                 pop_index = index
         try:
             del order_type[pop_index]
-            print('Deleted order with order_id:{}'.format(order_id))
+            logger.info('Deleted order with order_id:{}'.format(order_id))
         except NameError as e:
-            print('Order with order_id:{} does not exist '.format(order_id))
+            logger.warning('Order with order_id:{} does not exist '.format(order_id))
 
     @typeassert(dir=str, type=str, newline_selection=str)
     def export_to_csv(self, dir, type, newline_selection=''):
@@ -148,7 +151,7 @@ class OrderEventsWS(BaseWebSocket):
                     f_csv = csv.DictWriter(f, headers)
                     f_csv.writeheader()
                     f_csv.writerows(order_type)
-                    print('Successfully exported to csv')
+                    logger.info('Successfully exported to csv')
             else:
                 print('No order with type {} recorded'.format(type))
         else:
@@ -191,7 +194,7 @@ class OrderEventsWS(BaseWebSocket):
                 with open(os.path.join(r'{}'.format(dir), 'gemini_order_events.xml'),
                           'w') as f:
                     f.write(reparsed)
-                    print('Successfully exported to xml')
+                    logger.info('Successfully exported to xml')
             else:
                 print('No order with type {} recorded'.format(type))
         else:
